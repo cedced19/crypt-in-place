@@ -14,11 +14,11 @@ npm install
 
 Encrypt:
 ```
-node crypt-in-place.js --encrypt -f file.txt encrypt the file in place
+node crypt-in-place.js --encrypt -f file.txt -k key.txt
 ```
 Decrypt:
 ```
-node crypt-in-place.js --decrypt -f file.txt encrypt the file in place
+node crypt-in-place.js --decrypt -f file.txt -k key.txt
 ```
 
 ## TODO
