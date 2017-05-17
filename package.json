@@ -1,0 +1,28 @@
+{
+  "name": "crypt-in-place",
+  "version": "0.0.0",
+  "description": "A utility for encypting and decrypting files in place of previous files.",
+  "main": "crypt-in-place.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cedced19/crypt-in-place.git"
+  },
+  "keywords": [
+    "crypt",
+    "place",
+    "encrypt",
+    "decrypt",
+    "file"
+  ],
+  "author": "Cédric JUNG <cedced19@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cedced19/crypt-in-place/issues"
+  },
+  "homepage": "https://github.com/cedced19/crypt-in-place#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "exists-file": "^3.0.1",
+    "yargs": "^8.0.1"
+  }
+}
