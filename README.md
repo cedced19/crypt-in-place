@@ -12,11 +12,12 @@ npm install
 
 ## Usage
 
-```bash
+Encrypt:
+```
 node crypt-in-place.js --encrypt -f file.txt encrypt the file in place
 ```
-
-```bash
+Decrypt:
+```
 node crypt-in-place.js --decrypt -f file.txt encrypt the file in place
 ```
 
