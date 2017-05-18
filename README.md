@@ -21,7 +21,9 @@ Decrypt:
 node crypt-in-place.js --decrypt -f file.txt -k key.txt
 ```
 
+>  The algorithm is dependent on OpenSSL, examples are 'aes192', etc. On recent OpenSSL releases, openssl list-cipher-algorithms will display the available cipher algorithms.
+[Source](https://nodejs.org/api/crypto.html)
+
 ## TODO
  * add recursive mode
- * encrypt files without writing another file
  * publish on npm
