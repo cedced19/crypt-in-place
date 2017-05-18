@@ -8,12 +8,10 @@ var argv = require('yargs')
     .usage('Usage: $0 [mode] [options] [file...]')
     .example('$0 --encrypt -f file.txt -k key.txt', 'encrypt the file in place')
     .example('$0 --decrypt -f file.txt -k key.txt', 'decrypt the file in place')
-    // Encrypt mode
-    .alias('encrypt', 'e')
+    .alias('encrypt', 'e') // Encrypt mode
     .nargs('e', 0)
     .describe('e', 'Encrypt a file')
-    // Decrypt mode
-    .alias('decrypt', 'd')
+    .alias('decrypt', 'd') // Decrypt mode
     .nargs('d', 0)
     .describe('d', 'Decrypt a file')
     // Demand file
@@ -32,14 +30,13 @@ var argv = require('yargs')
     .alias('algorithm', 'a')
     .nargs('a', 1)
     .describe('a', 'Give the algorithm to encrypt and decrypt files')
-    // Help
     .help('h')
     .alias('h', 'help')
     .demandOption(['f'])
     .epilog('Copyright 2017 Cédric JUNG').argv;
 
 const mode = (argv.encrypt && !argv.decrypt ? 'encrypt' : '') || (argv.decrypt && !argv.encrypt ? 'decrypt' : '');
-const p = path.join(process.cwd(), argv.file);
+const p = path.resolve(process.cwd(), argv.file);
 const algorithm = (argv.algorithm ? argv.algorithm : 'aes192');
 
 if(!require('exists-file').sync(p)) {
@@ -51,7 +48,7 @@ var passphrase = argv.key;
 
 if (!passphrase && argv.keyfile) {
   try {
-    passphrase = fs.readFileSync(path.join(process.cwd(), argv.keyfile),'utf8');
+    passphrase = fs.readFileSync(path.resolve(process.cwd(), argv.keyfile),'utf8');
   } catch (e) {
     console.error('The file you provided does not exist.'.red);
     process.exit(1);
