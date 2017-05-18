@@ -87,11 +87,11 @@ if (mode == 'encrypt') {
       });
     }
   });
-} else {
+} else if (mode == 'decrypt') {
   const decipher = crypto.createDecipher(algorithm, new Buffer(passphrase));
 
   const outputPath = /.*\.enc$/.test(p) ? p.replace(/\.enc$/, '') : p+'.dec';
-  console.log(outputPath)
+
   const input = fs.createReadStream(p);
   const output = fs.createWriteStream(outputPath);
 
@@ -106,4 +106,6 @@ if (mode == 'encrypt') {
       });
     }
   });
+} else {
+  console.log('You didn\'t selected any mode. Please add `--encrypt` or `--decrypt`'.green);
 }
