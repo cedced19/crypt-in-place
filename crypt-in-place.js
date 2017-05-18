@@ -8,21 +8,31 @@ var argv = require('yargs')
     .usage('Usage: $0 [mode] [options] [file...]')
     .example('$0 --encrypt -f file.txt -k key.txt', 'encrypt the file in place')
     .example('$0 --decrypt -f file.txt -k key.txt', 'decrypt the file in place')
-    .alias('encrypt', 'e') // Encrypt mode
+    // Encrypt mode
+    .alias('encrypt', 'e')
     .nargs('e', 0)
     .describe('e', 'Encrypt a file')
-    .alias('decrypt', 'd') // Decrypt mode
+    // Decrypt mode
+    .alias('decrypt', 'd')
     .nargs('d', 0)
     .describe('d', 'Decrypt a file')
-    .alias('f', 'file') // Demand file
+    // Demand file
+    .alias('f', 'file')
     .nargs('f', 1)
     .describe('f', 'Load a file')
-    .alias('key', 'K') // Demand key
+     // Demand key
+    .alias('key', 'K')
     .nargs('K', 1)
     .describe('K', 'Give key phrase on command line')
-    .alias('keyfile', 'k') // Demand keyfile
+    // Demand keyfile
+    .alias('keyfile', 'k')
     .nargs('k', 1)
     .describe('k', 'Give key phrase on command line')
+    // Demand algorithm
+    .alias('algorithm', 'a')
+    .nargs('a', 1)
+    .describe('a', 'Give the algorithm to encrypt and decrypt files')
+    // Help
     .help('h')
     .alias('h', 'help')
     .demandOption(['f'])
@@ -30,6 +40,7 @@ var argv = require('yargs')
 
 const mode = (argv.encrypt && !argv.decrypt ? 'encrypt' : '') || (argv.decrypt && !argv.encrypt ? 'decrypt' : '');
 const p = path.join(process.cwd(), argv.file);
+const algorithm = (argv.algorithm ? argv.algorithm : 'aes192');
 
 if(!require('exists-file').sync(p)) {
   console.error('The file does not exist.'.red);
@@ -58,7 +69,7 @@ const logErr = function (err) {
 };
 
 if (mode == 'encrypt') {
-  const cipher = crypto.createCipher('aes192', new Buffer(passphrase));
+  const cipher = crypto.createCipher(algorithm, new Buffer(passphrase));
 
   const input = fs.createReadStream(p);
   const output = fs.createWriteStream(p+'.enc');
@@ -73,7 +84,7 @@ if (mode == 'encrypt') {
     });
   });
 } else {
-  const decipher = crypto.createDecipher('aes192', new Buffer(passphrase));
+  const decipher = crypto.createDecipher(algorithm, new Buffer(passphrase));
 
   const input = fs.createReadStream(p);
   const output = fs.createWriteStream(p+'.dec');
