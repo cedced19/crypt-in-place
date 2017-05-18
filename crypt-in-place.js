@@ -4,7 +4,7 @@ const colors = require('colors');
 const crypto = require('crypto');
 const fs = require('fs');
 
-var argv = require('yargs')
+let argv = require('yargs')
     .usage('Usage: $0 [mode] [options] [file...]')
     .example('$0 --encrypt -f file.txt -k key.txt', 'encrypt the file in place')
     .example('$0 --decrypt -f file.txt -k key.txt', 'decrypt the file in place')
@@ -30,6 +30,11 @@ var argv = require('yargs')
     .alias('algorithm', 'a')
     .nargs('a', 1)
     .describe('a', 'Give the algorithm to encrypt and decrypt files')
+    // Rename file with original filename and remove the original file
+    .alias('rename', 'r')
+    .nargs('r', 0)
+    .describe('r', 'Rename file with original filename and remove the original file')
+    // Help
     .help('h')
     .alias('h', 'help')
     .demandOption(['f'])
@@ -44,7 +49,7 @@ if(!require('exists-file').sync(p)) {
   process.exit(1);
 }
 
-var passphrase = argv.key;
+let passphrase = argv.key;
 
 if (!passphrase && argv.keyfile) {
   try {
@@ -75,24 +80,30 @@ if (mode == 'encrypt') {
 
   fs.unlink(p, function (err) {
     if (err) logErr(err);
-    fs.rename(p+'.enc', p, function () {
-      if (err) logErr(err);
-      console.log('File has been encrypted.'.green);
-    });
+    if (argv.rename) {
+      fs.rename(p+'.enc', p, function () {
+        if (err) logErr(err);
+        console.log('File has been encrypted.'.green);
+      });
+    }
   });
 } else {
   const decipher = crypto.createDecipher(algorithm, new Buffer(passphrase));
 
+  const outputPath = /.*\.enc$/.test(p) ? p.replace(/\.enc$/, '') : p+'.dec';
+  console.log(outputPath)
   const input = fs.createReadStream(p);
-  const output = fs.createWriteStream(p+'.dec');
+  const output = fs.createWriteStream(outputPath);
 
   input.pipe(decipher).pipe(output);
 
   fs.unlink(p, function (err) {
     if (err) logErr(err);
-    fs.rename(p+'.dec', p, function () {
-      if (err) logErr(err);
-      console.log('File has been decrypted.'.green);
-    });
+    if (!/.*\.enc$/.test(p)) {
+      fs.rename(p+'.dec', p, function () {
+        if (err) logErr(err);
+        console.log('File has been decrypted.'.green);
+      });
+    }
   });
 }
