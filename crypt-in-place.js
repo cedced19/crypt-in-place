@@ -3,6 +3,8 @@ const path = require('path');
 const colors = require('colors');
 const crypto = require('crypto');
 const fs = require('fs');
+const encrypt = require('./lib/encrypt.js');
+const decrypt = require('./lib/decrypt.js');
 
 let argv = require('yargs')
     .usage('Usage: $0 [mode] [options] [file...]')
@@ -65,47 +67,27 @@ if (!passphrase && !argv.keyfile) {
 }
 
 const logErr = function (err) {
-  console.error('An error occured.'.red);
-  console.log(err);
-  process.exit(1);
+  console.log('An error occured.'.red);
+  console.error(err);
 };
 
 if (mode == 'encrypt') {
-  const cipher = crypto.createCipher(algorithm, new Buffer(passphrase));
-
-  const input = fs.createReadStream(p);
-  const output = fs.createWriteStream(p+'.enc');
-
-  input.pipe(cipher).pipe(output);
-
-  fs.unlink(p, function (err) {
-    if (err) logErr(err);
+  encrypt(p, algorithm, passphrase, function (err) {
+    if (err) return logErr(err);
     if (argv.rename) {
       fs.rename(p+'.enc', p, function () {
-        if (err) logErr(err);
+        if (err) return logErr(err);
         console.log('File has been encrypted.'.green);
       });
+    } else {
+      console.log('File has been encrypted.'.green);
     }
   });
 } else if (mode == 'decrypt') {
-  const decipher = crypto.createDecipher(algorithm, new Buffer(passphrase));
-
-  const outputPath = /.*\.enc$/.test(p) ? p.replace(/\.enc$/, '') : p+'.dec';
-
-  const input = fs.createReadStream(p);
-  const output = fs.createWriteStream(outputPath);
-
-  input.pipe(decipher).pipe(output);
-
-  fs.unlink(p, function (err) {
-    if (err) logErr(err);
-    if (!/.*\.enc$/.test(p)) {
-      fs.rename(p+'.dec', p, function () {
-        if (err) logErr(err);
-        console.log('File has been decrypted.'.green);
-      });
-    }
+  decrypt(p, algorithm, passphrase, function (err) {
+    if (err) return logErr(err);
+    console.log('File has been decrypted.'.green);
   });
 } else {
-  console.log('You didn\'t selected any mode. Please add `--encrypt` or `--decrypt`'.green);
+  console.log('You didn\'t selected any mode. Please add `--encrypt` or `--decrypt`'.red);
 }
