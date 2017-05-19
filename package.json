@@ -32,5 +32,6 @@
     "mocha": "^3.4.1",
     "randomstring": "^1.1.5",
     "rimraf": "^2.6.1"
-  }
+  },
+  "engines" : { "node" : ">=6.0" }
 }
