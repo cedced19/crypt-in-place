@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const encrypt = require('./lib/encrypt.js');
 const decrypt = require('./lib/decrypt.js');
+const ls = require('./lib/ls.js');
 
 let argv = require('yargs')
     .usage('Usage: $0 [mode] [options] [file...]')
@@ -16,10 +17,10 @@ let argv = require('yargs')
     .alias('decrypt', 'd') // Decrypt mode
     .nargs('d', 0)
     .describe('d', 'Decrypt a file')
-    // Demand file
+    // Demand file or directory
     .alias('f', 'file')
     .nargs('f', 1)
-    .describe('f', 'Load a file')
+    .describe('f', 'Choose a file or a directory to encrypt or decrypt')
      // Demand key
     .alias('key', 'K')
     .nargs('K', 1)
@@ -46,9 +47,16 @@ const mode = (argv.encrypt && !argv.decrypt ? 'encrypt' : '') || (argv.decrypt &
 const p = path.resolve(process.cwd(), argv.file);
 const algorithm = (argv.algorithm ? argv.algorithm : 'aes192');
 
-if(!require('exists-file').sync(p)) {
+
+const stat = fs.statSync(p);
+if(!require('exists-file').sync(p) && !stat.isDirectory()) {
   console.error('The file does not exist.'.red);
   process.exit(1);
+}
+
+let list = [p];
+if (stat.isDirectory()) {
+  list = ls(p);
 }
 
 let passphrase = argv.key;
@@ -72,21 +80,25 @@ const logErr = function (err) {
 };
 
 if (mode == 'encrypt') {
-  encrypt(p, algorithm, passphrase, function (err) {
-    if (err) return logErr(err);
-    if (argv.rename) {
-      fs.rename(p+'.enc', p, function () {
-        if (err) return logErr(err);
-        console.log('File has been encrypted.'.green);
-      });
-    } else {
-      console.log('File has been encrypted.'.green);
-    }
+  list.forEach(function (filePath) {
+    encrypt(filePath, algorithm, passphrase, function (err) {
+      if (err) return logErr(err);
+      if (argv.rename) {
+        fs.rename(filePath+'.enc', filePath, function () {
+          if (err) return logErr(err);
+          console.log(colors.yellow(filePath) + ' File has been encrypted.'.green);
+        });
+      } else {
+        console.log(colors.yellow(filePath) + ' File has been encrypted.'.green);
+      }
+    });
   });
 } else if (mode == 'decrypt') {
-  decrypt(p, algorithm, passphrase, function (err) {
-    if (err) return logErr(err);
-    console.log('File has been decrypted.'.green);
+  list.forEach(function (filePath) {
+    decrypt(filePath, algorithm, passphrase, function (err) {
+      if (err) return logErr(err);
+      console.log(colors.yellow(filePath) + ' File has been decrypted.'.green);
+    });
   });
 } else {
   console.log('You didn\'t selected any mode. Please add `--encrypt` or `--decrypt`'.red);
