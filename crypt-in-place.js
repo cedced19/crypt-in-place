@@ -8,7 +8,7 @@ const decrypt = require('./lib/decrypt.js');
 const ls = require('./lib/ls.js');
 
 let argv = require('yargs')
-    .usage('Usage: $0 [mode] [options] [file...]')
+    .usage('Usage: $0 [mode] [options] -f [file...]')
     .example('$0 --encrypt -f file.txt -k key.txt', 'encrypt the file in place')
     .example('$0 --decrypt -f file.txt -k key.txt', 'decrypt the file in place')
     .alias('encrypt', 'e') // Encrypt mode

@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+ssh://git@github.com/cedced19/crypt-in-place.git"
   },
+  "scripts": {
+    "test": "mocha"
+  },
   "keywords": [
     "crypt",
     "place",
